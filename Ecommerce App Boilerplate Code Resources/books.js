@@ -1,9 +1,21 @@
-function renderBooks() {
+function renderBooks(filter) {
   const bookswrapper=document.querySelector('.books');
-  //console.log(bookswrapper);
+  
 
   const books = getBooks();
-  //console.log(books);
+
+
+  if (filter === 'LOW_TO_HIGH') {  
+  books.sort((a, b) => (a.salePrice || a.originalPrice) - (b.salePrice || b.originalPrice))
+  }
+  else if (filter === 'HIGH_TO_LOW') {
+    books.sort((a, b) => (b.salePrice || b.originalPrice) - (a.salePrice || a.originalPrice))
+  }
+  else if (filter === 'RATING') {
+    books.sort((a, b) => b.rating - a.rating)
+  }
+
+  
 
   const booksHtml =books.map((book) => {
     return `<div class="book">
@@ -14,31 +26,44 @@ function renderBooks() {
                 ${book.title}
               </div>
               <div class="book__ratings">
-                <i class="fas fa-star"></i>
-                <i class="fas fa-star"></i>
-                <i class="fas fa-star"></i>
-                <i class="fas fa-star"></i>
-                <i class="fas fa-star-half-alt"></i>
+                ${ratingHTML(book.rating)}
               </div>
               <div class="book__price">
-                <span>$${book.originalPrice.toFixed(2)}</span>
+                ${priceHTML(book.originalPrice, book.salePrice)}
               </div>
             </div>`;
   }).join("");
 
-  console.log(booksHtml);
-
   bookswrapper.innerHTML=booksHtml;
-  //console.log(booksHtml);
+}
 
-  //bookswrapper.innerHTML=
-  
+function priceHTML(originalPrice, salePrice) {
+  if (!salePrice) {
+    return `$${originalPrice.toFixed(2)}`
+  }
+  else {
+    return `<span class="book__price--normal">$${originalPrice.toFixed(2)}</span> $${salePrice.toFixed(2)}`
+  }
+  //return 'there is a sale'
+ //console.log(originalPrice, salePrice)
+  //<span class="book__price--normal">$59.95</span> $14.95
+}
+
+
+function ratingHTML (rating) {
+  let ratingHTML= '';
+  for (let i = 0; i < Math.floor(rating); ++i) {
+    ratingHTML += '<i class="fas fa-star"></i>\n'
+  }
+  if (!Number.isInteger(rating)) {
+    ratingHTML += '<i class="fas fa-star-half-alt"></i>\n'
+  }
+  return ratingHTML;
 }
 
 function filterBooks(event) {
-  //console.log(event.target.value);
-  if (event.target.value === "LOW_TO_HIGH") {
-    console.log ("sort By low to high")
+  
+    renderBooks(event.target.value);
 }
 
 setTimeout(() => {
